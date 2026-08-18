@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from app import db
+from app import llm
 
 
 class ChatRequest(BaseModel):
@@ -33,7 +34,13 @@ async def chat(req: ChatRequest):
         conversation_id = req.conversation_id
 
     await db.pool.execute(
-        "INSERT INTO messages (conversation_id, sender, message_text) VALUES ($1, 'customer', $2)",
-        conversation_id, req.message
+        "INSERT INTO messages (conversation_id, sender, message_text) VALUES ($1, 'customer', $2)", conversation_id, req.message
     )
-    return {"conversation_id": conversation_id, "reply": "on it, man!"}
+
+    agent_reply = await llm.get_reply(req.message)
+
+    await db.pool.execute(
+        "INSERT INTO messages (conversation_id, sender, message_text) VALUES ($1, 'agent', $2)", conversation_id, agent_reply
+    )
+
+    return {"conversation_id": conversation_id, "reply": agent_reply}
