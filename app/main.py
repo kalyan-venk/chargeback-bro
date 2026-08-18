@@ -3,8 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from app import db
-from app import llm
+from app import db, llm
 
 
 class ChatRequest(BaseModel):
