@@ -16,3 +16,6 @@ dev = [
     "httpx",
     "ruff"
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

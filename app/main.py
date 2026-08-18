@@ -1,7 +1,10 @@
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app import db
+
+from fastapi import FastAPI
 from pydantic import BaseModel
+
+from app import db
+
 
 class ChatRequest(BaseModel):
     conversation_id: int | None = None
