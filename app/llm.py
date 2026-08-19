@@ -12,3 +12,9 @@ async def get_reply(user_message: str) -> str:
     response = await client.messages.create(model="us.anthropic.claude-haiku-4-5-20251001-v1:0", max_tokens=512,
                                             messages=[{"role": "user", "content": user_message}], system=SYSTEM_PROMPT)
     return response.content[0].text
+
+async def stream_reply(history: str):
+    async with client.messages.stream(model="us.anthropic.claude-haiku-4-5-20251001-v1:0", max_tokens=512,
+                                            messages=history, system=SYSTEM_PROMPT) as stream:
+        async for text in stream.text_stream:
+            yield text
