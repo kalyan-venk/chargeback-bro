@@ -47,8 +47,9 @@ CREATE TABLE transactions(
     merchant_id BIGINT NOT NULL REFERENCES merchants(merchant_id),
     card_id BIGINT NOT NULL REFERENCES cards(card_id),
     transaction_time TIMESTAMPTZ NOT NULL DEFAULT now(),
+    category TEXT NOT NULL,
     transaction_status TEXT NOT NULL DEFAULT 'successful',
-    payment_method TEXT NOT NULL
+    is_fraud BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE fraud_checks(
