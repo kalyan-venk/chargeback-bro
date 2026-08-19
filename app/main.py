@@ -55,7 +55,7 @@ async def chat(req: ChatRequest):
         full_reply = ""
         yield "data: " + json.dumps({"conversation_id": conversation_id}) + "\n\n"
 
-        async for piece in llm.stream_reply(history):
+        async for piece in llm.stream_reply(history, 1): #TODO Auth
             full_reply += piece
             yield "data: " + json.dumps({"text": piece}) + "\n\n"
 
