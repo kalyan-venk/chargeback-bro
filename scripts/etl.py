@@ -2,7 +2,7 @@ import asyncio
 import csv
 import os
 import random
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import asyncpg
@@ -16,7 +16,7 @@ async def main():
         "TRUNCATE cardholders, merchants RESTART IDENTITY CASCADE"
     )
 
-    with open("data/credit_card_transaction_test.csv") as data2:
+    with open("data/credit_card_transaction_test.csv") as data2: #noqa: ASYNC230
         total_test_data = csv.DictReader(data2)
 
         people, merchants = {}, {}
@@ -54,14 +54,14 @@ async def main():
         )
         person["id_made_for_card"] = id_made_for_card["card_id"]
 
-    with open("data/credit_card_transaction_test.csv") as f:
+    with open("data/credit_card_transaction_test.csv") as f: #noqa: ASYNC230
         simple_rows = csv.DictReader(f)
 
         db_ready_rows = []
         for row in simple_rows:
             db_ready_rows.append([people[row["cc_num"]]["id_made_for_card"],
                                   merchants[row["merchant"].removeprefix("fraud_")]["id_made_for_merchant"],
-                                  Decimal(row["amt"]), datetime.strptime(row["trans_date_trans_time"], "%Y-%m-%d %H:%M:%S"), row["category"], row["is_fraud"] == "1"])
+                                  Decimal(row["amt"]), datetime.strptime(row["trans_date_trans_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC), row["category"], row["is_fraud"] == "1"])
 
         await conn.executemany(
             "INSERT INTO transactions (card_id, merchant_id, transaction_amount, transaction_time, category, is_fraud)"
