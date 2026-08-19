@@ -24,10 +24,8 @@ CREATE TABLE messages(
 CREATE TABLE merchants(
     merchant_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     merchant_name TEXT NOT NULL,
-    merchant_address TEXT NOT NULL,
     merchant_latitude FLOAT NOT NULL,
     merchant_longitude FLOAT NOT NULL,
-    merchant_risk FLOAT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -35,8 +33,6 @@ CREATE TABLE cards(
     card_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     person_id BIGINT NOT NULL REFERENCES cardholders(person_id),
     card_no_last4 TEXT NOT NULL,
-    name_on_card TEXT NOT NULL,
-    billing_address TEXT NOT NULL,
     provider TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
