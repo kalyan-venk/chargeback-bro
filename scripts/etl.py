@@ -61,7 +61,8 @@ async def main():
         for row in simple_rows:
             db_ready_rows.append([people[row["cc_num"]]["id_made_for_card"],
                                   merchants[row["merchant"].removeprefix("fraud_")]["id_made_for_merchant"],
-                                  Decimal(row["amt"]), datetime.strptime(row["trans_date_trans_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC), row["category"], row["is_fraud"] == "1"])
+                                  Decimal(row["amt"]), datetime.strptime(row["trans_date_trans_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC),
+                                  row["category"], row["is_fraud"] == "1"])
 
         await conn.executemany(
             "INSERT INTO transactions (card_id, merchant_id, transaction_amount, transaction_time, category, is_fraud)"
