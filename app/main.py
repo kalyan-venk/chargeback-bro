@@ -2,10 +2,10 @@ import json
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app import db, llm
-from fastapi.responses import StreamingResponse
 
 
 class ChatRequest(BaseModel):
