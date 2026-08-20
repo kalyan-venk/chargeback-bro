@@ -6,7 +6,8 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "anthropic[bedrock]",
-    "asyncpg"
+    "asyncpg",
+    "torch>=2.13.0",
 ]
 
 [dependency-groups]
