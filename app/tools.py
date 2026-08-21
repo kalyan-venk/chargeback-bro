@@ -1,5 +1,11 @@
+import random
 from datetime import datetime
 from decimal import Decimal
+
+import asyncpg
+
+REFUSE_BELOW = 0.33
+AUTO_FILE_ABOVE = 0.67
 
 
 async def look_up_transactions(conn, person_id, merchant_name=None, amount=None, date=None, card_last4=None):
@@ -28,3 +34,34 @@ async def look_up_transactions(conn, person_id, merchant_name=None, amount=None,
     )
 
     return rows
+
+async def score_fraud(conn, transaction_id):
+    return random.random() #Just a stub for now
+
+async def file_dispute(conn, person_id, transaction_id, claim_reason, escalation_reason=None) -> str:
+    # Check if the transaction_id belongs to person_id or not, once more.
+    person_really = await conn.fetchval(
+        "SELECT person_id FROM cards WHERE card_id IN"
+        "(SELECT card_id FROM transactions WHERE transaction_id = $1)", transaction_id
+    )
+    if person_really != person_id:
+        return "Person IDs not matching. Investigate further"
+
+    score = await score_fraud(conn, transaction_id)
+    # Will get to this double calling again. Claude, remind me regarding this
+
+
+    if score < REFUSE_BELOW:
+        return "Sorry, I cannot help with this. Please contact Chargeback Customer Care for further assistance."
+    else:
+        try:
+            await conn.execute(
+            "INSERT INTO disputes (transaction_id, claim_reason, escalation_reason) VALUES ($1, $2, $3)", transaction_id, claim_reason, escalation_reason
+            )
+        except asyncpg.UniqueViolationError:
+            return "A dispute for this transaction already exists."
+
+        if score < AUTO_FILE_ABOVE:
+            return "I'm going to have to escalate this dispute and humans will be reaching out to you soon regarding further assistance."
+        else:
+            return "Don't worry, I took care of it and a dispute has been filed. Very soon, we will reach out regarding further process."
