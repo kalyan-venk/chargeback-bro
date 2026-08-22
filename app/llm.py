@@ -1,3 +1,7 @@
+import json
+import time
+from datetime import UTC, datetime
+
 from anthropic import AsyncAnthropicBedrock
 
 from app import db, tools
@@ -63,7 +67,7 @@ async def get_reply(user_message: str) -> str:
                                             messages=[{"role": "user", "content": user_message}], system=SYSTEM_PROMPT)
     return response.content[0].text
 
-async def stream_reply(history: str, person_id: int):
+async def stream_reply(history: str, person_id: int, conversation_id: int, message_id: int):
     while True:
         async with client.messages.stream(model="us.anthropic.claude-haiku-4-5-20251001-v1:0", max_tokens=512,
                                                 messages=history, system=SYSTEM_PROMPT, tools=TOOLS) as stream:
@@ -78,6 +82,10 @@ async def stream_reply(history: str, person_id: int):
             else:
                 for block in final.content:
                     if block.type == "tool_use":
+                        # Start a timer here
+                        started_at = datetime.now(UTC)
+                        t0 = time.monotonic()
+
                         if block.name == "look_up_transactions":
                             # print(block.name, block.input, block.id)
                             rows = await tools.look_up_transactions(db.pool, person_id, **block.input)
@@ -96,3 +104,11 @@ async def stream_reply(history: str, person_id: int):
                         # print(rows)
                         history.append({"role": "assistant", "content": final.content})
                         history.append({"role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": result}]})
+
+                        # Stop the timer here
+                        latency_ms = int((time.monotonic() - t0) * 1000)
+
+                        await db.pool.execute(
+                            "INSERT INTO traces (conversation_id, after_message, tool_called, parameters_passed, result, latency_ms, started_at)"
+                            "VALUES ($1, $2, $3, $4, $5, $6, $7)", conversation_id, message_id, block.name, json.dumps(block.input), result, latency_ms, started_at
+                        )

@@ -64,3 +64,14 @@ CREATE TABLE disputes(
     status TEXT NOT NULL DEFAULT 'filed',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE traces(
+    trace_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    conversation_id BIGINT NOT NULL REFERENCES conversations(conversation_id),
+    after_message BIGINT NOT NULL REFERENCES messages(message_id),
+    tool_called TEXT NOT NULL,
+    parameters_passed JSONB NOT NULL,
+    result TEXT NOT NULL,
+    latency_ms INTEGER NOT NULL,
+    started_at TIMESTAMPTZ NOT NULL
+);

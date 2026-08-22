@@ -34,19 +34,30 @@ async def chat(req: ChatRequest):
     else:
         conversation_id = req.conversation_id
 
-    await db.pool.execute(
-        "INSERT INTO messages (conversation_id, sender, message_text) VALUES ($1, 'customer', $2)", conversation_id, req.message
+    row = await db.pool.fetchrow(
+        "INSERT INTO messages (conversation_id, sender, message_text) VALUES ($1, 'customer', $2) RETURNING message_id", conversation_id, req.message
     )
+    message_id = row["message_id"]
 
     # Adding multiple messages context
     rows = await db.pool.fetch(
-        "SELECT sender, message_text FROM messages WHERE conversation_id = $1 ORDER BY message_id", conversation_id
+        "SELECT message_id, sender, message_text FROM messages WHERE conversation_id = $1 ORDER BY message_id", conversation_id
+    )
+    tool_rows = await db.pool.fetch(
+        "SELECT after_message, tool_called, parameters_passed, result FROM traces WHERE conversation_id = $1 ORDER BY trace_id", conversation_id
     )
 
     history = []
     for row in rows:
         if row["sender"] == 'customer':
             history.append({"role": "user", "content": row["message_text"]})
+
+            # Tool usage details appending to the history
+            for tool_row in tool_rows:
+                if tool_row["after_message"] == row["message_id"]:
+                    history.append({"role": "assistant",
+                                    "content": "Internal tool log: " + tool_row["tool_called"] + " " + tool_row["parameters_passed"]
+                                    + " -> " + tool_row["result"]})
         else:
             history.append({"role": "assistant", "content": row["message_text"]})
 
@@ -55,7 +66,7 @@ async def chat(req: ChatRequest):
         full_reply = ""
         yield "data: " + json.dumps({"conversation_id": conversation_id}) + "\n\n"
 
-        async for piece in llm.stream_reply(history, 1): #TODO Auth
+        async for piece in llm.stream_reply(history, 1, conversation_id, message_id): #TODO Auth
             full_reply += piece
             yield "data: " + json.dumps({"text": piece}) + "\n\n"
 
