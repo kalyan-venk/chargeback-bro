@@ -7,11 +7,6 @@ import torch
 from sklearn.metrics import average_precision_score
 from torch import nn
 
-# Claude-built per the PYTORCH MODEL EXCEPTION (Kalyan 2026-08-21): the schedule
-# overflowed so this one script was finished by Claude, not typed by hand. When
-# Kalyan learns PyTorch properly he re-builds it himself and archives this version.
-# It keeps his beginner-readable style on purpose: plain loops, no clever wrappers.
-
 # Paths are anchored to this file so the script runs the same from any folder.
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
