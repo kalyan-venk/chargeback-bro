@@ -1,0 +1,13 @@
+{
+    "name": "second filing of the same dispute is refused",
+    "pinned_score": 0.9,
+    "messages": [
+      "Someone charged my card 2.86 at Kirlin and Sons on 2020-06-21. That was not me. Please dispute it.",
+      "Please file the dispute for that same 2.86 charge again."
+    ],
+    "checks": {
+      "exactly_one_dispute_row": true,
+      "tools_that_must_run": ["file_dispute"],
+      "second_reply_says_already_exists": true
+    }
+  }

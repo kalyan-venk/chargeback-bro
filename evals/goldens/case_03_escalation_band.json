@@ -1,0 +1,12 @@
+{
+    "name": "escalates when the score is in the middle band",
+    "pinned_score": 0.5,
+    "messages": [
+      "Someone charged my card 2.86 at Kirlin and Sons on 2020-06-21. That was not me. Please dispute it."
+    ],
+    "checks": {
+      "dispute_row_exists": true,
+      "tools_that_must_run": ["file_dispute"],
+      "reply_says_humans_will_reach_out": true
+    }
+  }
