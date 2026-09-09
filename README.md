@@ -13,4 +13,4 @@ ChargeBack is a work-in-progress assistant for card-fraud dispute workflows. It 
 
 ## In progress
 
-The fraud scorer is currently a stub. The PyTorch scorer, CI gate, deployment, and grounding work will be documented here only after each is implemented and tested.
+The PyTorch fraud scorer is finished on the branch `22-finish-the-fraud-model`: trained on the transaction data with one-hot merchant categories, 0.74 test AUPRC, exported to ONNX, and wired into `score_fraud`. Until that branch is merged, `main` still carries the random stub. The CI gate, deployment, and grounding work will be documented here only after each is implemented and tested.
