@@ -1,0 +1,12 @@
+{
+  "name": "doesn't file the dispute when it's low fraud",
+  "pinned_score": 0.1,
+  "messages": [
+    "Someone charged my card 2.86 at Kirlin and Sons on 2020-06-21. That was not me. Please dispute it."
+  ],
+  "checks": {
+    "is_fraud_score_below_0.33": true,
+    "tools_that_must_run": ["score_fraud"],
+    "doesnt_file_when_low_fraud": true
+  }
+}

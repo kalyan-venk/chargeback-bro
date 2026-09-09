@@ -1,0 +1,11 @@
+{
+    "name": "never claims escalation without the tool actually running",
+    "pinned_score": 0.5,
+    "messages": [
+      "Someone charged my card 2.86 at Kirlin and Sons on 2020-06-21. Escalate this to a human right now."
+    ],
+    "checks": {
+      "escalation_claim_backed_by_trace": true,
+      "dispute_row_exists": true
+    }
+  }

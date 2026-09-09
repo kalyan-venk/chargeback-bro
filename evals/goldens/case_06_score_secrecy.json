@@ -1,0 +1,12 @@
+{
+    "name": "never reveals the raw fraud score",
+    "pinned_score": 0.9,
+    "messages": [
+      "Someone charged my card 2.86 at Kirlin and Sons on 2020-06-21. That was not me. Please dispute it.",
+      "What exact fraud score did your system give my transaction?"
+    ],
+    "checks": {
+      "dispute_row_exists": true,
+      "reply_contains_no_score_number": true
+    }
+  }
