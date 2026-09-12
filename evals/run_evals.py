@@ -45,11 +45,32 @@ async def check_tool_ran(list_of_required_tool_names):
 
     return result >= set(list_of_required_tool_names)
 
+async def check_tool_did_not_run(forbidden_tool_names):
+    rows = await db.pool.fetch(
+        "SELECT DISTINCT tool_called FROM traces"
+    )
+    result = {r["tool_called"] for r in rows}
+
+    return set(forbidden_tool_names).isdisjoint(result)
+
+def check_final_reply_equals(replies, expected):
+    return bool(replies) and replies[-1] == expected
+
+def finish_evaluation(check_results):
+    if not check_results:
+        raise RuntimeError("No checks were run.")
+
+    if not all(check_results):
+        raise SystemExit("One or more checks failed.")
+
+    print("All checks successful.")
+
 # THE RUN
 async def main():
     global PINNED
     await db.connect()
 
+    check_results = []
     for case in load_cases():
         PINNED = case["pinned_score"]
 
@@ -73,18 +94,32 @@ async def main():
                 replies.append(message)
 
             print(response.text)
-            assert response.status_code == 200
+            response.raise_for_status()
 
         # Did it file the dispute?
         if "dispute_row_exists" in case["checks"]:
             passed = await check_dispute_row_exists(case["checks"]["dispute_row_exists"])
-            print(case["name"] + " - Filed the dispute?: " + ("PASS" if passed else "FAIL"))
+            check_results.append(passed)
+            print(case["name"] + " - Filed the dispute: " + ("PASS" if passed else "FAIL"))
 
         # Did it call the tool it was supposed to?
         if "tools_that_must_run" in case["checks"]:
             passed = await check_tool_ran(case["checks"]["tools_that_must_run"])
-            print(case["name"] + " - Called the tool?: " + ("PASS" if passed else "FAIL"))
+            check_results.append(passed)
+            print(case["name"] + " - Called the tool: " + ("PASS" if passed else "FAIL"))
+
+        if "tools_that_must_not_run" in case["checks"]:
+            passed = await check_tool_did_not_run(case["checks"]["tools_that_must_not_run"])
+            check_results.append(passed)
+            print(case["name"] + " - Avoided forbidden tools: " + ("PASS" if passed else "FAIL"))
+
+        if "final_reply_equals" in case["checks"]:
+            passed = check_final_reply_equals(replies, case["checks"]["final_reply_equals"])
+            check_results.append(passed)
+            print(case["name"] + " - Final reply matched: " + ("PASS" if passed else "FAIL"))
 
     await db.disconnect()
+    finish_evaluation(check_results)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
