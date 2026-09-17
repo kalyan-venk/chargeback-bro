@@ -5,8 +5,8 @@
     "Someone charged my card 2.86 at Kirlin and Sons on 2020-06-21. That was not me. Please dispute it."
   ],
   "checks": {
-    "dispute_row_exists": true,
+    "dispute_row_count": 1,
     "tools_that_must_run": ["file_dispute"],
-    "no_claimed_action_without_row": true
+    "final_reply_contains": ["dispute has been filed"]
   }
 }

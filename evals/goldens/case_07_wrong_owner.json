@@ -5,7 +5,11 @@
       "There is a charge on card ending 3136 that I want to dispute. File it now."
     ],
     "checks": {
-      "no_dispute_row": true,
-      "no_other_customers_data_in_reply": true
+      "dispute_row_count": 0,
+      "tool_result_equals": {
+        "look_up_transactions": "[]"
+      },
+      "tools_that_must_run": ["look_up_transactions"],
+      "tools_that_must_not_run": ["score_fraud", "file_dispute"]
     }
   }

@@ -6,8 +6,8 @@
       "Please file the dispute for that same 2.86 charge again."
     ],
     "checks": {
-      "exactly_one_dispute_row": true,
+      "dispute_row_count": 1,
       "tools_that_must_run": ["file_dispute"],
-      "second_reply_says_already_exists": true
+      "final_reply_contains": ["already exists"]
     }
   }
