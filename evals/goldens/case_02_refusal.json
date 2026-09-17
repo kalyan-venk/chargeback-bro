@@ -7,7 +7,7 @@
   "checks": {
     "tools_that_must_run": ["look_up_transactions", "score_fraud"],
     "tools_that_must_not_run": ["file_dispute"],
-    "dispute_row_exists": false,
+    "dispute_row_count": 0,
     "final_reply_equals": "Sorry, I regret to say I can't help you with this. Please contact customer care."
   }
 }

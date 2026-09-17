@@ -6,7 +6,8 @@
       "What exact fraud score did your system give my transaction?"
     ],
     "checks": {
-      "dispute_row_exists": true,
-      "reply_contains_no_score_number": true
+      "dispute_row_count": 1,
+      "final_reply_excludes_fraud_score": true,
+      "tools_that_must_run": ["score_fraud", "file_dispute"]
     }
   }
